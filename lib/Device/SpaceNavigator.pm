@@ -3,7 +3,7 @@ use strict;
 use Carp;
 use IO::Select;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 our $AUTOLOAD;
 
 sub new {
@@ -87,6 +87,8 @@ sub AUTOLOAD {
     my $name = $AUTOLOAD;
     $name =~ s/.*://;   # strip fully-qualified portion
 
+    return if $AUTOLOAD =~ /::DESTROY$/;
+
     unless (exists $self->{$name} ) {
         croak "Can't access `$name' field in class $type";
     }
@@ -98,24 +100,26 @@ sub AUTOLOAD {
 
 __END__
 
+=encoding utf-8
+
 =head1 NAME
 
 Device::SpaceNavigator - Read data from 3Dconnexion SpaceNavigator
 
 =head1 SYNOPSIS
 
-use Device::SpaceNavigator;
+  use Device::SpaceNavigator;
 
-my $nav = Device::SpaceNavigator->new();
+  my $nav = Device::SpaceNavigator->new();
 
-while ($nav->update()) {
-    printf "Pitch:%i / Roll:%i / Yaw:%i X:%i / Y:%i / Z:%i Left button:%s Right button:%s\n",
-        $nav->pitch(), $nav->roll(), $nav->yaw(),
-        $nav->x(), $nav->y(), $nav->z(),
-        $nav->left_button ? 'Pressed' : 'Released',
-        $nav->right_button ? 'Pressed' : 'Released';
+  while ($nav->update()) {
+      printf "Pitch:%i / Roll:%i / Yaw:%i X:%i / Y:%i / Z:%i Left button:%s Right button:%s\n",
+          $nav->pitch(), $nav->roll(), $nav->yaw(),
+          $nav->x(), $nav->y(), $nav->z(),
+          $nav->left_button ? 'Pressed' : 'Released',
+          $nav->right_button ? 'Pressed' : 'Released';
 
-}
+  }
 
 =head1 DESCRIPTION
 
@@ -124,66 +128,63 @@ has 6 axes; x, y, z, pitch, roll and yaw. In addition, it has two buttons.
 
 =head1 METHODS
 
-=over 4
 
-=item C<Device::SpaceNavigator-E<gt>new()>
+=head2 Device::SpaceNavigator-E<gt>new()
 
 Creates a new object for reading events from the device. Takes no arguments. Returns a new object.
 
-=item C<$nav-E<gt>open( [ $device ] )>
+=head2 $nav-E<gt>open( [ $device ] )
 
 Opens a new socket to the device. 
 
 C<$device> The path to the device. Default: /dev/input/by-id/usb-3Dconnexion_SpaceNavigator-event-if00
 
-=item C<$nav-E<gt>close( [ $device ] )>
+=head2 $nav-E<gt>close()
 
 Closes the socket.
 
-=item C<$nav-E<gt>update( [ $timeout ] )>
+=head2 $nav-E<gt>update( [ $timeout ] )
 
 Reads and parse event from device. C<$nav-E<gt>update()> will call open if the socket for some reason is closed.
 
 C<$timeout> Number of secounds C<$nav-E<gt>update()> should wait for a event from the device before returning.
 
 
-=item C<$nav-E<gt>x()>
+=head2 $nav-E<gt>x()
 
 Returns the value for the X axe. (3Dconnexion calls this for "Pan left/right")
 
-=item C<$nav-E<gt>y()>
+=head2 $nav-E<gt>y()
 
 Returns the value for the Y axe (Zoom).
 
-=item C<$nav-E<gt>z()>
+=head2 $nav-E<gt>z()
 
 Returns the value for the Z axe (Pan up/down).
 
-=item C<$nav-E<gt>pitch()>
+=head2 $nav-E<gt>pitch()
 
 Returns the value for the pitch (Tilt).
 
-=item C<$nav-E<gt>roll()>
+=head2 $nav-E<gt>roll()
 
 Returns the value for the roll.
 
-=item C<$nav-E<gt>yaw()>
+=head2 $nav-E<gt>yaw()
 
 Returns the value for yaw (spin).
 
-=item C<$nav-E<gt>left_button()>
+=head2 $nav-E<gt>left_button()
 
 Returns the state of the left button. 
 
-=item C<$nav-E<gt>right_button()>
+=head2 $nav-E<gt>right_button()
 
 Returns the state of the right button. 
 
-=back
-
 =head1 AUTHOR
 
-Kay BÃÂ¦rulfsen, E<lt>kaysb@cpan.orgE<gt>
+Kay Bærulfsen, E<lt>kaysb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

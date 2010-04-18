@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                Device-SpaceNavigator
-version:             0.01
+version:             0.02
 abstract:            Read data from 3Dconnexion SpaceNavigator
 license:             perl
 author:              
